@@ -38,7 +38,7 @@ module ActiveResource
           page = 0
           # as long as the number of results we got back is not less than the limit we (probably) have more to fetch
           while( (results.count - last_count) >= limit) do
-            raise ShopifyAPI::Limits::Error.new if ShopifyAPI.credit_maxed?
+            #raise ShopifyAPI::Limits::Error.new if ShopifyAPI.credit_maxed?
             page +=1
             last_count = results.count
             options[:params][:page] = page

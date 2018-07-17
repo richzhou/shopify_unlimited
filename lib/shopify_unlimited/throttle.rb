@@ -80,6 +80,17 @@ module ShopifyUnlimited
         else
           raise
         end        
+      rescue ActiveResource::ResourceNotFound => e
+        sleep 5 + not_found_tries + (rand * rand * 5)
+        not_found_tries += 1
+        if not_found_tries <= @not_found_retries
+          ActiveResource::Base.logger ||= Logger.new(STDOUT)
+          ActiveResource::Base.logger.info "Shopify returned not found: #{e.message}. Retrying"
+          retry
+        else
+          ActiveResource::Base.logger = orig_logger
+          raise
+        end
       end
       requests_made = left - ShopifyAPI.credit_left
       if requests_made > 1

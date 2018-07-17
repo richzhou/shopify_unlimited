@@ -71,6 +71,15 @@ module ShopifyUnlimited
         else
           raise
         end
+      rescue ActiveResource::BadRequest => e
+        @throttle += rand/5
+        tries += 1
+        sleep (@throttle * 4 * tries) + rand/10
+        if tries < 10
+          retry
+        else
+          raise
+        end        
       end
       requests_made = left - ShopifyAPI.credit_left
       if requests_made > 1

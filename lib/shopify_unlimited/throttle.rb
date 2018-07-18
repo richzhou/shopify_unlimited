@@ -12,7 +12,7 @@ module ShopifyUnlimited
       @throttle_increment = @throttle
       @requests_threshold = 10
       @debug = ! ENV['SHOPIFY_UNLIMITED_DEBUG'].blank?
-      @not_found_retries = Integer(ENV['SHOPIFY_UNLIMITED_NOTFOUND_RETRIES']) rescue 1
+      @not_found_retries = Integer(ENV['SHOPIFY_UNLIMITED_NOTFOUND_RETRIES']) rescue 10
     end
 
     def dbg(msg)
@@ -88,6 +88,8 @@ module ShopifyUnlimited
           ActiveResource::Base.logger.info "Shopify returned not found: #{e.message}. Retrying"
           retry
         else
+          ActiveResource::Base.logger ||= Logger.new(STDOUT)
+          ActiveResource::Base.logger.info "Shopify returned not found: #{e.message}. hit retry limit. Raising"
           ActiveResource::Base.logger = orig_logger
           raise
         end
